@@ -122,3 +122,57 @@ void Interface::handleUserChoice(list<Task>& todo) {
         }
     } while (choice != 6); //the user is shown the menu until he chooses to quit using the corresponding key
 }
+
+void Interface::editTaskProperties(Task& task, list<Task>& todo) { //choice switch
+    int option;
+    do {
+        cout << "\nEDIT TASK " << task.getName() << endl;
+        cout << "1. Rename task" << endl; //anti-collision mechanism implemented
+        cout << "2. Change description" << endl;
+        cout << "3. Mark as completed" << endl;
+        cout << "4. Mark as ToDo" << endl;
+        cout << "5. Mark as urgent" << endl;
+        cout << "6. Mark as non urgent" << endl;
+        cout << "7. Go back" << endl;
+        cin >> option;
+        cin.ignore();
+
+        switch (option) {
+            case 1: {
+                string newName;
+                cout << "Insert new name: ";
+                getline(cin, newName);
+                if (!TaskManager::nameCheck(todo, newName)) { //checks to avoid renaming a task as an already existing one
+                    task.setName(newName);
+                    cout << "Task renamed successfully." << endl;
+                    break;
+                }
+                break;
+            }
+            case 2: {
+                string newDesc;
+                cout << "New description: ";
+                getline(cin, newDesc);
+                task.setDescription(newDesc);
+                cout << "Description updated." << endl;
+                break;
+            }
+            case 3:
+                task.setCompleted();
+                break;
+            case 4:
+                task.setNotCompleted();
+                break;
+            case 5:
+                task.setUrgent();
+                break;
+            case 6:
+                task.setNotUrgent();
+                break;
+            case 7:
+                return;
+            default:
+                cout << "Invalid choice!" << endl;
+        }
+    } while (option != 7); //"7" key works like a "cancel" button, taking back the user to the home page
+}
