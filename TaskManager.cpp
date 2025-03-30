@@ -6,8 +6,7 @@
 void TaskManager::saveToFile(const list<Task>& todo, const string& filename) {
     ofstream file(filename);
     if (!file) {
-        cerr << "Error opening file for writing!" << endl; //missing/corrupted file
-        return;
+        throw runtime_error("Error opening file for writing!");
     }
 
     for (const auto& task : todo) { //inserts a task's data in order to save it in a specific way
@@ -22,8 +21,7 @@ void TaskManager::saveToFile(const list<Task>& todo, const string& filename) {
 void TaskManager::loadFromFile(list<Task>& todo, const string& filename) { //loads the saved tasks from file
     ifstream file(filename);
     if (!file) {
-        cerr << "No existing file found. Starting with a new one" << std::endl;
-        return;
+        throw runtime_error("Error opening file for reading!");
     }
 
     string line;
@@ -47,13 +45,11 @@ void TaskManager::loadFromFile(list<Task>& todo, const string& filename) { //loa
     file.close();
 }
 
-bool TaskManager::nameCheck(const list<Task> &todo, string& name) {
+bool TaskManager::isNameTaken(const list<Task> &todo, string& name) { //implemented in task renaming and creation
     for (auto& task : todo) {
         if (task.getName() == name) {
-            cout << "Task with the same name already exists!" << endl;
             return true;
         } //if two tasks with the same name exist, the user is notified and the function returns true
     }
     return false;
-    //will be useful later as having two tasks with the same name might cause problems
 }

@@ -33,12 +33,13 @@ void Interface::handleUserChoice(list<Task>& todo) {
                 string name, description;
                 cout << "Insert new task Name: ";
                 getline(cin, name); //checks what user types and saves the whole line
-                if(!TaskManager::nameCheck(todo,name)){ //uses function to look for names collision
+                if(!TaskManager::isNameTaken(todo, name)){ //uses function to look for names collision
                     cout << "Insert new task Description: "; //if no collisions occur, it lets the user continue
                     getline(cin, description);
-                    todo.emplace_back(name, description); //inserts newly added task into the list
+                    todo.emplace_back(Task(name, description)); //inserts newly added task into the list
                     cout << "Task added!" << endl;
-                    break;
+                }  else {
+                    cout << "Task name already taken!" << endl; //if a collision is found, the user is warned
                 }
                 break;
             }
@@ -47,7 +48,7 @@ void Interface::handleUserChoice(list<Task>& todo) {
                 cout << "Insert task name to remove it: ";
                 getline(cin, name);
                 bool found = false;
-                for (auto it = todo.begin(); it != todo.end(); ++it) { //checks the whole list
+                for (auto it = todo.begin(); it != todo.end(); it++) { //checks the whole list
                     if (it->getName() == name) { //if a task has the same name as the targeted one
                         todo.erase(it); //it's deleted
                         cout << "Task removed." << endl;
@@ -112,7 +113,12 @@ void Interface::handleUserChoice(list<Task>& todo) {
                 break;
             }
             case 6: {
-                TaskManager::saveToFile(todo, /*file name, something like "tasks.txt"*/); //saves edited tasks into file
+                try {
+                    TaskManager::saveToFile(todo, "taskList.txt"); //saves the list into a file
+                } catch (const runtime_error& e) {
+                    cout << "Fatal failure: " << e.what() << endl;
+                    return;
+                }
                 cout << "Tasks saved successfully. Exiting..." << endl;
                 return;
             }
@@ -134,6 +140,7 @@ void Interface::editTaskProperties(Task& task, list<Task>& todo) { //choice swit
         cout << "5. Mark as urgent" << endl;
         cout << "6. Mark as non urgent" << endl;
         cout << "7. Go back" << endl;
+        cout << "Enter your choice: " << endl;
         cin >> option;
         cin.ignore();
 
@@ -142,10 +149,12 @@ void Interface::editTaskProperties(Task& task, list<Task>& todo) { //choice swit
                 string newName;
                 cout << "Insert new name: ";
                 getline(cin, newName);
-                if (!TaskManager::nameCheck(todo, newName)) { //checks to avoid renaming a task as an already existing one
+                if (!TaskManager::isNameTaken(todo, newName)) { //checks to avoid renaming a task as an already existing one
                     task.setName(newName);
                     cout << "Task renamed successfully." << endl;
                     break;
+                } else {
+                    cout << "Task name already taken!" << endl;
                 }
                 break;
             }
@@ -157,22 +166,47 @@ void Interface::editTaskProperties(Task& task, list<Task>& todo) { //choice swit
                 cout << "Description updated." << endl;
                 break;
             }
-            case 3:
-                task.setCompleted();
+            case 3:{
+                bool success = task.setCompleted();
+                if (success) {
+                    cout << "Task marked as completed." << endl;
+                } else {
+                    cout << "Task is already completed." << endl;
+                }
                 break;
-            case 4:
-                task.setNotCompleted();
+            }
+            case 4: {
+                bool success = task.setNotCompleted();
+                if (success) {
+                    cout << "Task marked as ToDo." << endl;
+                } else {
+                    cout << "Task is already ToDo." << endl;
+                }
                 break;
-            case 5:
-                task.setUrgent();
+            }
+            case 5: {
+                bool success = task.setUrgent();
+                if (success) {
+                    cout << "Task set as urgent." << endl;
+
+                } else {
+                    cout << "Task is already urgent." << endl;
+                }
                 break;
-            case 6:
-                task.setNotUrgent();
+            }
+            case 6: {
+                bool success = task.setNotUrgent();
+                if (success) {
+                    cout << "Task set as not urgent." << endl;
+                } else {
+                    cout << "Task is already not urgent." << endl;
+                }
                 break;
+            }
             case 7:
                 return;
             default:
                 cout << "Invalid choice!" << endl;
         }
-    } while (option != 7); //"7" key works like a "cancel" button, taking back the user to the home page
+    } while (option != 7); //"7" key works like a "back" button, taking back the user to the home page
 }

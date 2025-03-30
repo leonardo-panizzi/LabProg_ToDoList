@@ -11,7 +11,7 @@ using namespace std;
 
 class Task {
 public:
-    Task(string& n, string& d, bool u = false, bool c = false) : name(n), description(d), urgent(u), completed(c){}
+    Task(string& n, string& d, bool u = false, bool c = false) : name(n), description(d), urgent(u), completed(c) {}
 
 
     //getter and setter methods
@@ -35,46 +35,41 @@ public:
         return urgent;
     }
 
-    void setUrgent() {
+    bool setUrgent() {
         if (!urgent) {
             urgent = true;
-            cout << "Successfully set as urgent" << endl;
+            return true;
         }
-        else {
-            cout << "Task is already urgent" << endl;
-        }
+
+        return false;
     }
 
-    void setNotUrgent() {
+    bool setNotUrgent() {
         if (urgent) {
             urgent = false;
-            cout << "Successfully set as not urgent" << endl;
+            return true;
         }
-        else {
-            cout << "Task is already not urgent" << endl;
-        }
+        return false;
     }
 
     bool isCompleted() const {
         return completed;
     }
 
-    void setCompleted() {
+    bool setCompleted() {
         if (!completed) {
             completed = true;
-            cout << "Task set as completed" << endl;
-        } else {
-            cout << "Task is already set as completed" << endl;
+            return true;
         }
+        return false;
     }
 
-    void setNotCompleted() {
+    bool setNotCompleted() {
         if (completed) {
             completed = false;
-            cout << "Task set as not completed" << endl;
-        } else {
-            cout << "Task was already marked as not completed" << endl;
+            return true;
         }
+        return false;
     }
 
 private:
