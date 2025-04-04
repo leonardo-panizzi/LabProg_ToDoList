@@ -11,7 +11,7 @@ using namespace std;
 
 class Task {
 public:
-    Task(string& n, string& d, bool u = false, bool c = false) : name(n), description(d), urgent(u), completed(c) {}
+    Task(const string& n, const string& d, bool u = false, bool c = false) : name(n), description(d), urgent(u), completed(c) {}
 
 
     //getter and setter methods
