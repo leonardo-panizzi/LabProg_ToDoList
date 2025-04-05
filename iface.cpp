@@ -3,9 +3,10 @@
 //
 
 #include <limits>
-#include "Interface.h"
+#include "iface.h"
+#include "TaskManager.h"
 
-void Interface::showMenu() {
+void iface::showMenu() {
     cout << "\n[HOME]" << endl;
     cout << "1. Add a task" << endl; //inserts a new task into a list
     cout << "2. Remove a task" << endl;
@@ -15,7 +16,7 @@ void Interface::showMenu() {
     cout << "6. Save and quit" << endl; //saves changes permanently into a file and shuts down the program
 }
 
-void Interface::handleUserChoice(list<Task>& todo) {
+void iface::handleUserChoice(list<Task>& todo) {
     int choice;
     do {
         showMenu();
@@ -129,7 +130,7 @@ void Interface::handleUserChoice(list<Task>& todo) {
     } while (choice != 6); //the user is shown the menu until he chooses to quit using the corresponding key
 }
 
-void Interface::editTaskProperties(Task& task, list<Task>& todo) { //choice switch
+void iface::editTaskProperties(Task& task, list<Task>& todo) { //choice switch
     int option;
     do {
         cout << "\nEDIT TASK " << task.getName() << endl;
