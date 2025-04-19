@@ -4,7 +4,7 @@
 
 #include <limits>
 #include "iface.h"
-#include "TaskManager.h"
+#include "TaskList.h"
 
 void iface::showMenu() {
     cout << "\n[HOME]" << endl;
@@ -16,7 +16,7 @@ void iface::showMenu() {
     cout << "6. Save and quit" << endl; //saves changes permanently into a file and shuts down the program
 }
 
-void iface::handleUserChoice(list<Task>& todo) {
+void iface::handleUserChoice(TaskList &todoList) {
     int choice;
     do {
         showMenu();
@@ -34,10 +34,10 @@ void iface::handleUserChoice(list<Task>& todo) {
                 string name, description;
                 cout << "Insert new task Name: ";
                 getline(cin, name); //checks what user types and saves the whole line
-                if(!TaskManager::isNameTaken(todo, name)){ //uses function to look for names collision
+                if(!todoList.isNameTaken(name)) { //checks for name collisions
                     cout << "Insert new task Description: "; //if no collisions occur, it lets the user continue
                     getline(cin, description);
-                    todo.emplace_back(Task(name, description)); //inserts newly added task into the list
+                    todoList.addTask(name, description, false); //inserts newly added task into the list
                     cout << "Task added!" << endl;
                 }  else {
                     cout << "Task name already taken!" << endl; //if a collision is found, the user is warned
@@ -49,9 +49,9 @@ void iface::handleUserChoice(list<Task>& todo) {
                 cout << "Insert task name to remove it: ";
                 getline(cin, name);
                 bool found = false;
-                for (auto it = todo.begin(); it != todo.end(); it++) { //checks the whole list
-                    if (it->getName() == name) { //if a task has the same name as the targeted one
-                        todo.erase(it); //it's deleted
+                for (const auto& it:todoList.getTasks()) { //checks the whole list
+                    if (it.getName() == name) { //if a task has the same name as the targeted one
+                        todoList.removeTask(it.getName()); //it's deleted
                         cout << "Task removed." << endl;
                         found = true;
                         break;
@@ -67,9 +67,9 @@ void iface::handleUserChoice(list<Task>& todo) {
                 cout << "Enter task name to edit it: ";
                 getline(cin, name);
                 bool found = false;
-                for (auto& task : todo) { //looks for the task
+                for (auto& task : todoList.getTasks()) { //looks for the task
                     if (task.getName() == name) { //if found
-                        editTaskProperties(task, todo); //uses an apposite function whose purpose is task editing
+                        editTaskProperties(task, todoList); //uses an apposite function whose purpose is task editing
                         found = true;
                         break;
                     }
@@ -81,41 +81,35 @@ void iface::handleUserChoice(list<Task>& todo) {
             }
             case 4: {
                 cout << "\nAll tasks:" << endl;
-                if (todo.empty()) {
+                if (todoList.isEmpty()) {
                     cout << "No tasks available." << endl; //if no tasks are saved yet
                     break;
                 } else { //3 different cycles
-                    for (const auto &task: todo) { //1st cycle shows "urgent" tasks first
-                        if (task.isUrgent() && !task.isCompleted()) {
-                            cout << "- " << task.getName() << ": " << task.getDescription() << endl;
-                        }
+                    cout << "Urgent tasks: " << endl;
+                    for (const auto &task: todoList.getUrgentTasks()) { //1st cycle shows "urgent" tasks first
+                        cout << "- " << task.getName() << ": " << task.getDescription() << endl;
                     }
-                    for (const auto &task: todo) { //2nd cycle shows regular tasks
-                        if (!task.isUrgent() && !task.isCompleted()) {
-                            cout << "- " << task.getName() << ": " << task.getDescription() << endl;
-                        }
+                    cout << "Regular tasks: " << endl;
+                    for (const auto &task: todoList.getNotUrgentTasks()) { //2nd cycle shows regular tasks
+                        cout << "- " << task.getName() << ": " << task.getDescription() << endl;
                     }
                     cout << "Completed tasks: " << endl; //3rd cycle only shows already completed tasks
-                    for (const auto &task : todo){
-                        if(task.isCompleted()){
-                            cout << "[X] " << task.getName() << ": " << task.getDescription() << endl;
-                        } //displays task preceded by a "tick"
+                    for (const auto &task : todoList.getCompletedTasks()){
+                        cout << "[X] " << task.getName() << ": " << task.getDescription() << endl;
                     }
                 }
                 break;
             }
             case 5: {
                 cout << "\nCompleted tasks:" << endl;
-                for (const auto& task : todo) { //history, hence only completed tasks are shown
-                    if(task.isCompleted()) {
-                        cout << "[X] " << task.getName() << ": " << task.getDescription() << endl;
-                    }
+                for (const auto& task : todoList.getCompletedTasks()) { //history, hence only completed tasks are shown
+                    cout << "[X] " << task.getName() << ": " << task.getDescription() << endl;
                 }
                 break;
             }
             case 6: {
                 try {
-                    TaskManager::saveToFile(todo, "taskList.txt"); //saves the list into a file
+                    todoList.save(); //saves the list into a file
                 } catch (const runtime_error& e) {
                     cout << "Fatal failure: " << e.what() << endl;
                     return;
@@ -130,7 +124,7 @@ void iface::handleUserChoice(list<Task>& todo) {
     } while (choice != 6); //the user is shown the menu until he chooses to quit using the corresponding key
 }
 
-void iface::editTaskProperties(Task& task, list<Task>& todo) { //choice switch
+void iface::editTaskProperties(Task& task, TaskList &todoList) { //choice switch
     int option;
     do {
         cout << "\nEDIT TASK " << task.getName() << endl;
@@ -150,7 +144,7 @@ void iface::editTaskProperties(Task& task, list<Task>& todo) { //choice switch
                 string newName;
                 cout << "Insert new name: ";
                 getline(cin, newName);
-                if (!TaskManager::isNameTaken(todo, newName)) { //checks to avoid renaming a task as an already existing one
+                if (todoList.isNameTaken(newName)) { //checks to avoid renaming a task as an already existing one
                     task.setName(newName);
                     cout << "Task renamed successfully." << endl;
                     break;
@@ -209,5 +203,5 @@ void iface::editTaskProperties(Task& task, list<Task>& todo) { //choice switch
             default:
                 cout << "Invalid choice!" << endl;
         }
-    } while (option != 7); //"7" key works like a "back" button, taking back the user to the home page
+    } while (option != 7); //the "7" key works like a "back" button, taking back the user to the home page
 }
