@@ -6,8 +6,9 @@
 #include "iface.h"
 #include "TaskList.h"
 
-void iface::showMenu() {
+void iface::showMenu(TaskList &todoList) {
     cout << "\n[HOME]" << endl;
+    cout << "Pending tasks: " << todoList.tasksToComplete() << endl; //shows how many tasks are still pending
     cout << "1. Add a task" << endl; //inserts a new task into a list
     cout << "2. Remove a task" << endl;
     cout << "3. Edit a task properties" << endl; //allows to fully edit a task with its properties
@@ -19,7 +20,7 @@ void iface::showMenu() {
 void iface::handleUserChoice(TaskList &todoList) {
     int choice;
     do {
-        showMenu();
+        showMenu(todoList); //shows the menu
         cout << "Enter your choice: ";
         if (!(cin >> choice)) {
             cin.clear();
@@ -63,13 +64,13 @@ void iface::handleUserChoice(TaskList &todoList) {
                 break;
             }
             case 3: {
-                string name;
+                string taskName;
                 cout << "Enter task name to edit it: ";
-                getline(cin, name);
+                getline(cin, taskName);
                 bool found = false;
                 for (auto& task : todoList.getTasks()) { //looks for the task
-                    if (task.getName() == name) { //if found
-                        editTaskProperties(task, todoList); //uses an apposite function whose purpose is task editing
+                    if (task.getName() == taskName) { //if found
+                        editTaskProperties(taskName, todoList); //uses an apposite function whose purpose is task editing
                         found = true;
                         break;
                     }
@@ -124,10 +125,10 @@ void iface::handleUserChoice(TaskList &todoList) {
     } while (choice != 6); //the user is shown the menu until he chooses to quit using the corresponding key
 }
 
-void iface::editTaskProperties(Task& task, TaskList &todoList) { //choice switch
+void iface::editTaskProperties(string& taskName, TaskList &todoList) { //choice switch
     int option;
     do {
-        cout << "\nEDIT TASK " << task.getName() << endl;
+        cout << "\nEDIT TASK " << taskName << endl;
         cout << "1. Rename task" << endl; //anti-collision mechanism implemented
         cout << "2. Change description" << endl;
         cout << "3. Mark as completed" << endl;
@@ -144,9 +145,10 @@ void iface::editTaskProperties(Task& task, TaskList &todoList) { //choice switch
                 string newName;
                 cout << "Insert new name: ";
                 getline(cin, newName);
-                if (todoList.isNameTaken(newName)) { //checks to avoid renaming a task as an already existing one
-                    task.setName(newName);
+                if (!todoList.isNameTaken(newName)) { //checks to avoid renaming a task as an already existing one
+                    todoList.renameTask(taskName, newName);
                     cout << "Task renamed successfully." << endl;
+                    taskName = newName; //updates the name of the task
                     break;
                 } else {
                     cout << "Task name already taken!" << endl;
@@ -157,12 +159,12 @@ void iface::editTaskProperties(Task& task, TaskList &todoList) { //choice switch
                 string newDesc;
                 cout << "New description: ";
                 getline(cin, newDesc);
-                task.setDescription(newDesc);
+                todoList.editDescription(taskName, newDesc); //uses the method to edit the description
                 cout << "Description updated." << endl;
                 break;
             }
-            case 3:{
-                bool success = task.setCompleted();
+            case 3: {
+                bool success = todoList.markTaskAsCompleted(taskName); //uses the method to set the task as completed
                 if (success) {
                     cout << "Task marked as completed." << endl;
                 } else {
@@ -171,7 +173,7 @@ void iface::editTaskProperties(Task& task, TaskList &todoList) { //choice switch
                 break;
             }
             case 4: {
-                bool success = task.setNotCompleted();
+                bool success = todoList.markTaskAsNotCompleted(taskName);
                 if (success) {
                     cout << "Task marked as ToDo." << endl;
                 } else {
@@ -180,7 +182,7 @@ void iface::editTaskProperties(Task& task, TaskList &todoList) { //choice switch
                 break;
             }
             case 5: {
-                bool success = task.setUrgent();
+                bool success = todoList.markTaskAsUrgent(taskName);
                 if (success) {
                     cout << "Task set as urgent." << endl;
 
@@ -190,7 +192,7 @@ void iface::editTaskProperties(Task& task, TaskList &todoList) { //choice switch
                 break;
             }
             case 6: {
-                bool success = task.setNotUrgent();
+                bool success = todoList.markTaskAsNotUrgent(taskName);
                 if (success) {
                     cout << "Task set as not urgent." << endl;
                 } else {

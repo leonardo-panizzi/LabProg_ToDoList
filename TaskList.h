@@ -59,25 +59,41 @@ public:
         }
     }
 
-    void markTaskAsCompleted(const string &name) {
+    bool markTaskAsCompleted(const string &name) {
         auto task = findTask(name);
-        task.setCompleted();
-        task.setNotUrgent();
+        if(task->isCompleted()) {
+            return false;
+        }
+        task->setCompleted();
+        task->setNotUrgent();
+        return true;
     }
 
-    void markTaskAsNotCompleted(const string &name) {
+    bool markTaskAsNotCompleted(const string &name) {
         auto task = findTask(name);
-        task.setNotCompleted();
+        if(!task->isCompleted()){
+            return false;
+        }
+        task->setNotCompleted();
+        return true;
     }
 
-    void markTaskAsUrgent(const string &name) {
+    bool markTaskAsUrgent(const string &name) {
         auto task = findTask(name);
-        task.setUrgent();
+        if(task->isUrgent()) {
+            return false;
+        }
+        task->setUrgent();
+        return true;
     }
 
-    void markTaskAsNotUrgent(const string &name) {
+    bool markTaskAsNotUrgent(const string &name) {
         auto task = findTask(name);
-        task.setNotUrgent();
+        if(!task->isUrgent()){
+            return false;
+        }
+        task->setNotUrgent();
+        return true;
     }
 
     void renameTask(const string &oldName, const string &newName) {
@@ -85,12 +101,12 @@ public:
         if (isNameTaken(newName)) {
             throw runtime_error("Name is already taken");
         }
-        task.setName(newName);
+        task->setName(newName);
     }
 
     void editDescription(const string &name, const string &newDescription) {
         auto task = findTask(name);
-        task.setDescription(newDescription);
+        task->setDescription(newDescription);
     }
 
     void loadFromFile(); //loads the tasks saved in the file
@@ -107,15 +123,16 @@ public:
     list<Task> getNotUrgentTasks() const;
     list<Task> getCompletedTasks() const;
 
+
 private:
     const string filePath;
     string listName;
     list<Task> tasks;
 
-    Task& findTask(const string &name) {
+    Task* findTask(const string &name) {
         for (auto &task : tasks) {
             if (task.getName() == name) {
-                return task;
+                return &task;
             }
         }
         throw runtime_error("Task not found");

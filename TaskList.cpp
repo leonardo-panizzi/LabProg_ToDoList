@@ -86,3 +86,4 @@ list<Task> TaskList::getCompletedTasks() const {
     }
     return completedTasks;
 }
+
