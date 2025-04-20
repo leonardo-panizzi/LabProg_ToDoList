@@ -128,7 +128,7 @@ void iface::handleUserChoice(TaskList &todoList) {
 void iface::editTaskProperties(string& taskName, TaskList &todoList) { //choice switch
     int option;
     do {
-        cout << "\nEDIT TASK " << taskName << endl;
+        cout << "\nEDIT TASK '" << taskName << "'" << endl;
         cout << "1. Rename task" << endl; //anti-collision mechanism implemented
         cout << "2. Change description" << endl;
         cout << "3. Mark as completed" << endl;
