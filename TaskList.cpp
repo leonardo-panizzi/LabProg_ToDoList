@@ -57,6 +57,84 @@ bool TaskList::isNameTaken(const std::string& name) {
     return false;
 }
 
+int TaskList::tasksToComplete() {
+    int count = 0;
+    for(auto task : tasks) {
+        if (!task.isCompleted()) {
+            count++;
+        }
+    }
+    return count;
+}
+
+void TaskList::addTask(const std::string &name, const std::string &description, bool urgent) {
+    if (isNameTaken(name)) { //checks for name collisions
+        throw runtime_error("Name is already taken");
+    }
+
+    auto newTask = Task(name, description, urgent, false);
+    tasks.push_back(newTask);
+}
+
+void TaskList::removeTask(const std::string &name) {
+    bool found = false;
+    for (auto it = tasks.begin(); it != tasks.end(); ++it) {
+        if (it->getName() == name) {
+            tasks.erase(it);
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        throw runtime_error("Task not found");
+    }
+}
+
+bool TaskList::markTaskAsCompleted(const std::string &name) {
+    auto task = findTask(name);
+    if(task->isCompleted()) {
+        return false;
+    }
+    task->setCompleted();
+    task->setNotUrgent();
+    return true;
+}
+
+bool TaskList::markTaskAsNotCompleted(const std::string &name) {
+    auto task = findTask(name);
+    if(!task->isCompleted()){
+        return false;
+    }
+    task->setNotCompleted();
+    return true;
+}
+
+bool TaskList::markTaskAsUrgent(const std::string &name) {
+    auto task = findTask(name);
+    if(task->isUrgent()) {
+        return false;
+    }
+    task->setUrgent();
+    return true;
+}
+
+bool TaskList::markTaskAsNotUrgent(const std::string &name) {
+    auto task = findTask(name);
+    if(!task->isUrgent()){
+        return false;
+    }
+    task->setNotUrgent();
+    return true;
+}
+
+void TaskList::renameTask(const std::string &oldName, const std::string &newName) {
+    auto task = findTask(oldName);
+    if (isNameTaken(newName)) {
+        throw runtime_error("Name is already taken");
+    }
+    task->setName(newName);
+}
+
 list<Task> TaskList::getUrgentTasks() const {
     list<Task> urgentTasks;
     for(auto task : tasks) {
@@ -86,4 +164,3 @@ list<Task> TaskList::getCompletedTasks() const {
     }
     return completedTasks;
 }
-

@@ -16,93 +16,25 @@ public:
     TaskList(const string &filePath) : filePath(filePath) {
         loadFromFile();
     }
-    TaskList() = default;
+    TaskList() = default; //remove?
 
     void save();
 
-    bool isNameTaken(const string& name);
+    int tasksToComplete(); //counter for uncompleted tasks
 
-    int tasksToComplete() { //counter for uncompleted tasks
-        int count = 0;
+    void addTask(const string &name, const string &description, bool urgent); //adds a task to the list
 
-        for(auto task : tasks) {
-            if (!task.isCompleted()) {
-                count++;
-            }
-        }
+    void removeTask(const string &name); //removes a task from the list
 
-        return count;
-    }
+    bool markTaskAsCompleted(const string &name);
 
-    void addTask(const string &name, const string &description, bool urgent) { //adds a task to the list
-        if (isNameTaken(name)) { //checks for name collisions
-            throw runtime_error("Name is already taken");
-        }
+    bool markTaskAsNotCompleted(const string &name);
 
-        auto newTask = Task(name, description, urgent, false);
-        tasks.push_back(newTask);
-    }
+    bool markTaskAsUrgent(const string &name);
 
-    void removeTask(const string &name) { //removes a task from the list
-        bool found = false;
+    bool markTaskAsNotUrgent(const string &name);
 
-        for (auto it = tasks.begin(); it != tasks.end(); ++it) {
-            if (it->getName() == name) {
-                tasks.erase(it);
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
-            throw runtime_error("Task not found");
-        }
-    }
-
-    bool markTaskAsCompleted(const string &name) {
-        auto task = findTask(name);
-        if(task->isCompleted()) {
-            return false;
-        }
-        task->setCompleted();
-        task->setNotUrgent();
-        return true;
-    }
-
-    bool markTaskAsNotCompleted(const string &name) {
-        auto task = findTask(name);
-        if(!task->isCompleted()){
-            return false;
-        }
-        task->setNotCompleted();
-        return true;
-    }
-
-    bool markTaskAsUrgent(const string &name) {
-        auto task = findTask(name);
-        if(task->isUrgent()) {
-            return false;
-        }
-        task->setUrgent();
-        return true;
-    }
-
-    bool markTaskAsNotUrgent(const string &name) {
-        auto task = findTask(name);
-        if(!task->isUrgent()){
-            return false;
-        }
-        task->setNotUrgent();
-        return true;
-    }
-
-    void renameTask(const string &oldName, const string &newName) {
-        auto task = findTask(oldName);
-        if (isNameTaken(newName)) {
-            throw runtime_error("Name is already taken");
-        }
-        task->setName(newName);
-    }
+    void renameTask(const string &oldName, const string &newName);
 
     void editDescription(const string &name, const string &newDescription) {
         auto task = findTask(name);
@@ -128,6 +60,8 @@ private:
     const string filePath;
     string listName;
     list<Task> tasks;
+
+    bool isNameTaken(const string& name); //private method to avoid renaming a task as an already existing one
 
     Task* findTask(const string &name) {
         for (auto &task : tasks) {
