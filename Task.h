@@ -35,7 +35,15 @@ public:
         return urgent;
     }
 
-    bool setUrgent() {
+    bool setUrgentness(bool u) {
+        if (urgent != u) {
+            urgent = u;
+            return true;
+        }
+        return false;
+    }
+
+    /*bool setUrgent() {
         if (!urgent) {
             urgent = true;
             return true;
@@ -50,13 +58,21 @@ public:
             return true;
         }
         return false;
-    }
+    }*/
 
     bool isCompleted() const {
         return completed;
     }
 
-    bool setCompleted() {
+    bool setCompleteness(bool c) {
+        if (completed != c) {
+            completed = c;
+            return true;
+        }
+        return false;
+    }
+
+    /*bool setCompleted() {
         if (!completed) {
             completed = true;
             return true;
@@ -70,7 +86,7 @@ public:
             return true;
         }
         return false;
-    }
+    }*/
 
 private:
     string name, description; //name and task description

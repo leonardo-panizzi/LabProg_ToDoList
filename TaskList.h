@@ -16,7 +16,6 @@ public:
     TaskList(const string &filePath) : filePath(filePath) {
         loadFromFile();
     }
-    TaskList() = default; //remove?
 
     void save();
 
@@ -26,13 +25,17 @@ public:
 
     void removeTask(const string &name); //removes a task from the list
 
-    bool markTaskAsCompleted(const string &name);
+    bool setTaskCompleted(const string &name, bool completed); //marks a task as completed
 
-    bool markTaskAsNotCompleted(const string &name);
+    /*bool markTaskAsCompleted(const string &name);
 
-    bool markTaskAsUrgent(const string &name);
+    bool markTaskAsNotCompleted(const string &name);*/
 
-    bool markTaskAsNotUrgent(const string &name);
+    bool setTaskUrgent(const string &name, bool urgent); //marks a task as urgent
+
+    /*bool markTaskAsUrgent(const string &name);
+
+    bool markTaskAsNotUrgent(const string &name);*/
 
     void renameTask(const string &oldName, const string &newName);
 
@@ -40,8 +43,6 @@ public:
         auto task = findTask(name);
         task->setDescription(newDescription);
     }
-
-    void loadFromFile(); //loads the tasks saved in the file
 
     list<Task> getTasks() const {
         return tasks;
@@ -55,11 +56,16 @@ public:
     list<Task> getNotUrgentTasks() const;
     list<Task> getCompletedTasks() const;
 
+    int getTaskCount() const {
+        return tasks.size();
+    }
 
 private:
     const string filePath;
     string listName;
     list<Task> tasks;
+
+    void loadFromFile(); //loads the tasks saved in the file
 
     bool isNameTaken(const string& name); //private method to avoid renaming a task as an already existing one
 

@@ -90,6 +90,7 @@ void TaskList::removeTask(const std::string &name) {
     }
 }
 
+/*
 bool TaskList::markTaskAsCompleted(const std::string &name) {
     auto task = findTask(name);
     if(task->isCompleted()) {
@@ -126,7 +127,7 @@ bool TaskList::markTaskAsNotUrgent(const std::string &name) {
     task->setNotUrgent();
     return true;
 }
-
+*/
 void TaskList::renameTask(const std::string &oldName, const std::string &newName) {
     auto task = findTask(oldName);
     if (isNameTaken(newName)) {
@@ -163,4 +164,15 @@ list<Task> TaskList::getCompletedTasks() const {
         }
     }
     return completedTasks;
+}
+
+bool TaskList::setTaskCompleted(const string &name, bool completed) {
+    auto task = findTask(name);
+    task->setUrgentness(false);
+    return task->setCompleteness(completed);
+}
+
+bool TaskList::setTaskUrgent(const std::string &name, bool urgent) {
+    auto task = findTask(name);
+    return task->setUrgentness(urgent);
 }

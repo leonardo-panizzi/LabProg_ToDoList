@@ -35,14 +35,18 @@ void iface::handleUserChoice(TaskList &todoList) {
                 string name, description;
                 cout << "Insert new task Name: ";
                 getline(cin, name); //checks what user types and saves the whole line
-                if(!todoList.isNameTaken(name)) { //checks for name collisions
-                    cout << "Insert new task Description: "; //if no collisions occur, it lets the user continue
-                    getline(cin, description);
+
+                cout << "Insert new task Description: "; //if no collisions occur, it lets the user continue
+                getline(cin, description);
+
+                try {
                     todoList.addTask(name, description, false); //inserts newly added task into the list
                     cout << "Task added!" << endl;
-                }  else {
+
+                }  catch (runtime_error& e) {
                     cout << "Task name already taken!" << endl; //if a collision is found, the user is warned
                 }
+
                 break;
             }
             case 2: {
@@ -125,7 +129,7 @@ void iface::handleUserChoice(TaskList &todoList) {
     } while (choice != 6); //the user is shown the menu until he chooses to quit using the corresponding key
 }
 
-void iface::editTaskProperties(string& taskName, TaskList &todoList) { //choice switch
+void iface::editTaskProperties(string &taskName, TaskList &todoList) { //choice switch
     int option;
     do {
         cout << "\nEDIT TASK '" << taskName << "'" << endl;
@@ -145,14 +149,16 @@ void iface::editTaskProperties(string& taskName, TaskList &todoList) { //choice 
                 string newName;
                 cout << "Insert new name: ";
                 getline(cin, newName);
-                if (!todoList.isNameTaken(newName)) { //checks to avoid renaming a task as an already existing one
+
+                try {
                     todoList.renameTask(taskName, newName);
                     cout << "Task renamed successfully." << endl;
                     taskName = newName; //updates the name of the task
-                    break;
-                } else {
+
+                } catch (runtime_error &e) {
                     cout << "Task name already taken!" << endl;
                 }
+
                 break;
             }
             case 2: {
@@ -164,7 +170,7 @@ void iface::editTaskProperties(string& taskName, TaskList &todoList) { //choice 
                 break;
             }
             case 3: {
-                bool success = todoList.markTaskAsCompleted(taskName); //uses the method to set the task as completed
+                bool success = todoList.setTaskCompleted(taskName, true); //uses the method to set the task as completed
                 if (success) {
                     cout << "Task marked as completed." << endl;
                 } else {
@@ -173,7 +179,7 @@ void iface::editTaskProperties(string& taskName, TaskList &todoList) { //choice 
                 break;
             }
             case 4: {
-                bool success = todoList.markTaskAsNotCompleted(taskName);
+                bool success = todoList.setTaskCompleted(taskName, false);
                 if (success) {
                     cout << "Task marked as ToDo." << endl;
                 } else {
@@ -182,7 +188,7 @@ void iface::editTaskProperties(string& taskName, TaskList &todoList) { //choice 
                 break;
             }
             case 5: {
-                bool success = todoList.markTaskAsUrgent(taskName);
+                bool success = todoList.setTaskUrgent(taskName, true);
                 if (success) {
                     cout << "Task set as urgent." << endl;
 
@@ -192,7 +198,7 @@ void iface::editTaskProperties(string& taskName, TaskList &todoList) { //choice 
                 break;
             }
             case 6: {
-                bool success = todoList.markTaskAsNotUrgent(taskName);
+                bool success = todoList.setTaskUrgent(taskName, false);
                 if (success) {
                     cout << "Task set as not urgent." << endl;
                 } else {
