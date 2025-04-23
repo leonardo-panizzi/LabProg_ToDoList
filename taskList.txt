@@ -1,0 +1,5 @@
+Piano;get the piano tuned;0;0
+Bike;change bike oil;0;0
+Trash;take the trash out;0;1
+Vet;take the cat to the vet;1;0
+Pc;change the thermal paste;0;0
