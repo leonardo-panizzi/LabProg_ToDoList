@@ -8,7 +8,9 @@
 
 void iface::showMenu(TaskList &todoList) {
     cout << "\n[HOME]" << endl;
-    cout << "Pending tasks: " << todoList.tasksToComplete() << endl; //shows how many tasks are still pending
+    cout << "All tasks: " << todoList.getTasks().size()
+    << " - of which pending: " << todoList.tasksToComplete() << endl; /*shows total amount of tasks and those that
+    *have yet to be completed*/
     cout << "1. Add a task" << endl; //inserts a new task into a list
     cout << "2. Remove a task" << endl;
     cout << "3. Edit a task properties" << endl; //allows to fully edit a task with its properties

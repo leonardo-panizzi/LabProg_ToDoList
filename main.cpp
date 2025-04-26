@@ -5,9 +5,8 @@
 int main() {
 
     /*what's new:
-     * all functions from virtual class "TaskManager" were replaced using a namespace instead
-     * a TaskList class was added for better list management
-     * a new "pending tasks" counter was added to constantly show what's left to do*/
+     * similar code has been recycled, a new counter has appeared in the home screen, const references have
+     * been adjusted and unit testing environment has been prepped */
 
     try {
         TaskList todo("taskList.txt");
