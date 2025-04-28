@@ -49,7 +49,8 @@ TEST(TaskTest, SetUrgentnessChangesUrgentStatus) { //testing the urgent status s
     EXPECT_FALSE(t.setUrgentness(true));
 }
 
-TEST(TaskTest, SetCompletenessChangesUrgentStatus) { //according to the way the code has been written, a completed task cannot be urgent, let's check this:
+//according to the way the code has been written, a completed task cannot be urgent, let's check this:
+TEST(TaskTest, SetCompletenessChangesUrgentStatus) {
     Task t("Task", "Desc", false, false);
 
     EXPECT_TRUE(t.setCompleteness(true));
@@ -108,6 +109,8 @@ TEST(TaskListTest, RemoveTaskDecreasesTaskCount) {
 
     remove(testFilePath.c_str());
 }
+
+
 
 
 // Test: removing a non-existing task throws an exception
@@ -224,6 +227,138 @@ TEST(TaskListTest, GetUrgentTasksReturnsOnlyUrgent) {
     remove(testFilePath.c_str());
 }
 
+// Test: getting not urgent tasks only
+TEST(TaskListTest, GetNotUrgentTasksReturnsOnlyNotUrgent) {
+    const string testFilePath = "test_dummy11.txt";
+    ofstream(testFilePath).close();
+
+    TaskList taskList(testFilePath);
+
+    taskList.addTask("UrgentTask1", "Description1", true);   // urgent
+    taskList.addTask("NonUrgentTask1", "Description2", false); // not urgent
+    taskList.addTask("NonUrgentTask2", "Description3", false); // not urgent
+
+    auto notUrgentTasks = taskList.getNotUrgentTasks();
+
+    EXPECT_EQ(notUrgentTasks.size(), 2); // there should only be 2 tasks
+
+    for (const auto& task : notUrgentTasks) {
+        EXPECT_FALSE(task.isUrgent()); // checking that each task is indeed not urgent
+    }
+
+    remove(testFilePath.c_str());
+}
+
+// Test: getting completed tasks only
+TEST(TaskListTest, GetCompletedTasksReturnsOnlyCompleted) {
+    const string testFilePath = "test_dummy12.txt";
+    ofstream(testFilePath).close();
+
+    TaskList taskList(testFilePath);
+
+    taskList.addTask("CompletedTask1", "Description1", false); // not completed
+    taskList.addTask("CompletedTask2", "Description2", false); // not completed
+    taskList.setTaskCompleted("CompletedTask1", true); // mark as completed
+
+    auto completedTasks = taskList.getCompletedTasks();
+
+    EXPECT_EQ(completedTasks.size(), 1); // there should only be 1 completed task
+
+    for (const auto& task : completedTasks) {
+        EXPECT_TRUE(task.isCompleted()); // checking that each task is indeed completed
+    }
+
+    remove(testFilePath.c_str());
+}
+
+// Test: the task count is correct after adding and removing tasks
+TEST(TaskListTest, TaskCountAfterAddRemove) {
+    const string testFilePath = "test_dummy13.txt";
+    ofstream(testFilePath).close();
+
+    TaskList taskList(testFilePath);
+    taskList.addTask("Task1", "Description1", false);
+    taskList.addTask("Task2", "Description2", true);
+
+    EXPECT_EQ(taskList.getTaskCount(), 2); // should be 2 tasks
+
+    taskList.removeTask("Task1");
+    EXPECT_EQ(taskList.getTaskCount(), 1); // should be 1 task after removal
+
+    remove(testFilePath.c_str());
+}
+
+// Test: loading from file correctly populates the task list
+TEST(TaskListTest, LoadFromFile) {
+    const string testFilePath = "test_dummy14.txt";
+    ofstream(testFilePath) << "Task1;Description1;0;0\nTask2;Description2;1;0\n"; // two different tasks
+    TaskList taskList(testFilePath);
+
+    EXPECT_EQ(taskList.getTaskCount(), 2); // should load 2 tasks
+
+    auto tasks = taskList.getTasks();
+    auto it = tasks.begin();
+    EXPECT_EQ(it->getName(), "Task1");
+    EXPECT_EQ(it->getDescription(), "Description1");
+    EXPECT_FALSE(it->isUrgent());
+    EXPECT_FALSE(it->isCompleted());
+
+    ++it;
+    EXPECT_EQ(it->getName(), "Task2");
+    EXPECT_EQ(it->getDescription(), "Description2");
+    EXPECT_TRUE(it->isUrgent());
+    EXPECT_FALSE(it->isCompleted());
+
+    remove(testFilePath.c_str());
+}
+
+// Test: saving to file actually saves the task list correctly
+
+TEST(TaskListTest, SaveToFile) {
+    const string testFilePath = "test_dummy15.txt";
+    ofstream(testFilePath).close();
+
+    TaskList taskList(testFilePath);
+    taskList.addTask("Task1", "Description1", false);
+    taskList.addTask("Task2", "Description2", true);
+    taskList.save();
+
+    ifstream file(testFilePath);
+    string line;
+    int count = 0;
+    while (getline(file, line)) {
+        count++;
+    }
+    EXPECT_EQ(count, 2); // should save 2 tasks
+
+    remove(testFilePath.c_str());
+}
+
+// Test: the task list is not empty after adding tasks
+TEST(TaskListTest, NotEmptyAfterAddingTasks) {
+    const string testFilePath = "test_dummy16.txt";
+    ofstream(testFilePath).close();
+
+    TaskList taskList(testFilePath);
+    taskList.addTask("Task1", "Description1", false);
+    EXPECT_FALSE(taskList.isEmpty()); // should not be empty after adding a task
+
+    remove(testFilePath.c_str());
+}
+
+// Test: the task list is empty after removing all tasks
+TEST(TaskListTest, EmptyAfterRemovingAllTasks) {
+    const string testFilePath = "test_dummy17.txt";
+    ofstream(testFilePath).close();
+
+    TaskList taskList(testFilePath);
+    taskList.addTask("Task1", "Description1", false);
+    taskList.removeTask("Task1");
+    EXPECT_TRUE(taskList.isEmpty()); // should be empty after removing all tasks
+
+    remove(testFilePath.c_str());
+}
+
 
 // Tests for iface class (trickier to test, as it requires user input which can partially be simulated)
 
@@ -265,3 +400,21 @@ TEST(InterfaceTest, EditTaskPropertiesMarkUrgent) {
     remove(testFilePath.c_str());
 }
 
+// Test: the EditTaskProperties function correctly edits a task's completion status
+TEST(InterfaceTest, EditTaskPropertiesEditCompletion) {
+    const string testFilePath = "test_iface3.txt";
+    ofstream(testFilePath).close();
+
+    TaskList taskList(testFilePath);
+    taskList.addTask("Task1", "SomeDescription", false);
+
+    string taskName = "Task1";
+
+    bool success = taskList.setTaskCompleted(taskName, true);
+    EXPECT_TRUE(success);
+
+    auto completedTasks = taskList.getCompletedTasks();
+    EXPECT_EQ(completedTasks.size(), 1);
+
+    remove(testFilePath.c_str());
+}
