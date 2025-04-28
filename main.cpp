@@ -5,8 +5,9 @@
 int main() {
 
     /*what's new:
-     * similar code has been recycled, a new counter has appeared in the home screen, const references have
-     * been adjusted and unit testing environment has been prepped */
+     * similar code has been recycled, a new counter has appeared in the home screen (for both completed
+     * and pending tasks), const references have been adjusted where they needed to
+     * and unit testing has been executed */
 
     try {
         TaskList todo("/home/master/ProgToDo/taskList.txt");
