@@ -1,34 +1,12 @@
-cmake_minimum_required(VERSION 3.29)
+cmake_minimum_required(VERSION 3.16)
 project(ProgToDo)
-#google testing stuff begin:
-# include(FetchContent)
-
-#FetchContent_Declare(
-#       googletest
-#       URL https://github.com/google/googletest/archive/refs/heads/main.zip
-#)
-# avoids mid-build installations
-#set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-#FetchContent_MakeAvailable(googletest)
-#google testing stuff end
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")       #might wanna comment this out
+add_subdirectory(ToDoList)
+add_subdirectory(google_test)
 
-add_executable(ProgToDo main.cpp iface.cpp iface.h TaskList.cpp TaskList.h Task.h)
+add_executable(ProgToDo_main main.cpp)
 
-# google testing
-#enable_testing()
-
-#add_executable(
-#       ProgToDoTests
-#       test/test_task.cpp
-#       test/test_tasklist.cpp
-#)
-
-#target_link_libraries(
-#        ProgToDoTests
-#        gtest_main
-#)
-
-#include(GoogleTest)
-#gtest_discover_tests(ProgToDoTests)
+target_link_libraries(ProgToDo_main PRIVATE ProgToDo_LIB)

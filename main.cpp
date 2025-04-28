@@ -9,7 +9,7 @@ int main() {
      * been adjusted and unit testing environment has been prepped */
 
     try {
-        TaskList todo("taskList.txt");
+        TaskList todo("/home/master/ProgToDo/taskList.txt");
         iface::handleUserChoice(todo);
         return 0;
 

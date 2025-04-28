@@ -27,15 +27,7 @@ public:
 
     bool setTaskCompleted(const string &name, bool completed); //marks a task as completed
 
-    /*bool markTaskAsCompleted(const string &name);
-
-    bool markTaskAsNotCompleted(const string &name);*/
-
     bool setTaskUrgent(const string &name, bool urgent); //marks a task as urgent
-
-    /*bool markTaskAsUrgent(const string &name);
-
-    bool markTaskAsNotUrgent(const string &name);*/
 
     void renameTask(const string &oldName, const string &newName);
 
