@@ -33,7 +33,7 @@ void TaskList::loadFromFile() { //loads the saved tasks from file
     file.close();
 }
 
-void TaskList::save() {
+const void TaskList::save() {
     ofstream file(filePath);
     if (!file) {
         throw runtime_error("Error opening file for writing!");

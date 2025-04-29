@@ -125,7 +125,7 @@ TEST(TaskListTest, RemoveNonExistentTaskThrows) {
 }
 
 // Test: task name editing
-TEST(TaskListTest, RenameTaskChangesName) {
+TEST(TaskListTest, RenameTaskChangesName) { //fixed, now uses the find function instead of a for loop
     const string testFilePath = "test_dummy5.txt";
     ofstream(testFilePath).close();
 
@@ -134,14 +134,11 @@ TEST(TaskListTest, RenameTaskChangesName) {
     taskList.renameTask("OldName", "NewName");
 
     auto tasks = taskList.getTasks();
-    bool foundNewName = false;
-    for (const auto& task : tasks) {
-        if (task.getName() == "NewName") {
-            foundNewName = true;
-            break;
-        }
-    }
-    EXPECT_TRUE(foundNewName);
+    auto it = find_if(tasks.begin(), tasks.end(), [](const Task& task) {
+        return task.getName() == "NewName";
+    });
+
+    EXPECT_TRUE(it != tasks.end()); //expects to find the task with the new name inside the list
 
     remove(testFilePath.c_str());
 }
@@ -289,12 +286,13 @@ TEST(TaskListTest, TaskCountAfterAddRemove) {
 }
 
 // Test: loading from file correctly populates the task list
-TEST(TaskListTest, LoadFromFile) {
+TEST(TaskListTest, LoadFromFile) { //fixed: added a check on the number of tasks that yet to be completed
     const string testFilePath = "test_dummy14.txt";
     ofstream(testFilePath) << "Task1;Description1;0;0\nTask2;Description2;1;0\n"; // two different tasks
     TaskList taskList(testFilePath);
 
     EXPECT_EQ(taskList.getTaskCount(), 2); // should load 2 tasks
+    EXPECT_EQ(taskList.tasksToComplete(), 2); // <-- added "EXPECTED_EQ" on the amount of tasks to complete to fix the test
 
     auto tasks = taskList.getTasks();
     auto it = tasks.begin();
@@ -313,26 +311,33 @@ TEST(TaskListTest, LoadFromFile) {
 }
 
 // Test: saving to file actually saves the task list correctly
-
+//fixed: now checks that there actually are 2 tasks with the expected names
 TEST(TaskListTest, SaveToFile) {
     const string testFilePath = "test_dummy15.txt";
     ofstream(testFilePath).close();
 
     TaskList taskList(testFilePath);
-    taskList.addTask("Task1", "Description1", false);
-    taskList.addTask("Task2", "Description2", true);
+    taskList.addTask("Task1", "Description1", false); // adds task1
+    taskList.addTask("Task2", "Description2", true); // adds task2
     taskList.save();
 
-    ifstream file(testFilePath);
-    string line;
-    int count = 0;
-    while (getline(file, line)) {
-        count++;
-    }
-    EXPECT_EQ(count, 2); // should save 2 tasks
+    ifstream file(testFilePath); // opens the file
+    ASSERT_TRUE(file.is_open()); // checks if the file was correctly opened
 
+    vector<string> expectedNames = {"Task1", "Task2"}; // expected task names
+    string line, name;
+    int i = 0;
+    while (getline(file, line)) { // reads each line
+        istringstream iss(line);
+        getline(iss, name, ';'); // extracts the name only
+        EXPECT_EQ(name, expectedNames[i]); // checks if the name matches the expected one
+        i++; // increments the counter going to the following line
+    }
+
+    EXPECT_EQ(i, 2); // checks that there are 2 tasks in the file
     remove(testFilePath.c_str());
 }
+
 
 // Test: the task list is not empty after adding tasks
 TEST(TaskListTest, NotEmptyAfterAddingTasks) {

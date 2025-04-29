@@ -3,3 +3,5 @@ Bike;change bike oil;0;0
 Trash;take the trash out;0;1
 Vet;take the cat to the vet;1;0
 Pc;change the thermal paste;0;0
+PPM;check footer;0;0
+Buy eggs;buy eggs for tomorrow's cake;0;0

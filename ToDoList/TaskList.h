@@ -17,7 +17,7 @@ public:
         loadFromFile();
     }
 
-    void save();
+    const void save(); //fixed (can be const)
 
     int tasksToComplete(); //counter for uncompleted tasks
 
